@@ -130,7 +130,6 @@ if __name__=='__main__':
         shutil.copytree('%s/Report_Figures' % path,
                         '%s/Report_Figures' % outputDir)
 
-        # XXX should be indented for final version
         for fname in glob('%s/sphinx_files/*' % path):
             print('Copying {} to {}'.format(fname, outputDir))
             shutil.copy(fname, outputDir)
