@@ -10,6 +10,7 @@ import subprocess
 import argparse
 import sys
 import os
+import shutil
 
 path = os.path.abspath(os.path.dirname(__file__))
 print("++ INFO [Main]: Using Report library located in: %s" % path)
@@ -46,7 +47,6 @@ if __name__=='__main__':
     from argparse import ArgumentParser
     import meica_figures
     import rst_files
-    import sphinx_files
     import nibabel as ni
     import numpy   as np
     import pandas  as pd
@@ -113,13 +113,15 @@ if __name__=='__main__':
     figureDir = os.path.abspath(options.out_dir)
     if options.overwrite:
         subprocess.call('rm -rf %s' % outputDir, shell=True)
-        subprocess.call('mkdir %s' % outputDir,  shell=True)
     if not (os.path.exists(outputDir)):
-        subprocess.call('mkdir %s' % outputDir,  shell=True)
-    subprocess.call('mkdir %s/Report_Figures' % outputDir,    shell=True)
-    subprocess.call('mkdir %s/sphinx_files' % outputDir,      shell=True)
-    subprocess.call('mkdir %s/axialized_nifti' % outputDir, shell=True)
-    subprocess.call('cp %s/bokeh_plot.py %s/Report_Figures/bokeh_plot.py' % (os.path.dirname(__file__), outputDir),shell=True)
+        os.mkdir(outputDir)
+    os.mkdir('%s/sphinx_files' % outputDir)
+    os.mkdir('%s/axialized_nifti' % outputDir)
+
+    shutil.copytree('Report_Figures', '%s/Report_Figures' % outputDir)
+    # Might need to go into root dir, where we could use a glob
+    shutil.copytree('sphinx_files', '%s/Report_Figures' % outputDir)
+    
     # =========  report starts   =========
     # ====================================
     
@@ -216,12 +218,6 @@ if __name__=='__main__':
     newline = "#!/usr/bin/env python \n" + ("TED_dir = '%s' \n" % os.path.abspath(TED_dir)) + ("outputDir,figures = '%s','%s'\n" % (outputDir,'Report_Figures'))
     with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'r') as original: bokeh_plot = original.read()
     with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'w') as modified: modified.write(newline + bokeh_plot)
-    
-    # set up sphinx documentation
-    # ---------------------------
-    
-    sphinx_files.conf(__version__,outputDir)
-    sphinx_files.make_file(outputDir)
     
     # make .rst files for sphinx to use to generate the report
     # --------------------------------------------------------
