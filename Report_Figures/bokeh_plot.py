@@ -14,7 +14,8 @@ from bokeh.models        import ColumnDataSource, HoverTool, CustomJS, TapTool, 
 from bokeh.models.widgets import DataTable, TableColumn, NumberFormatter, BooleanFormatter, CheckboxEditor
 from bokeh.models.widgets import Tabs, Panel, Select
 from bokeh.document      import Document
-from bokeh.plotting      import figure, gridplot, output_file, show, hplot, vplot
+from bokeh.plotting      import figure, gridplot, output_file, show
+from bokeh.layouts       import row, column
 from scipy.stats         import scoreatpercentile
 from bokeh.models.glyphs import ImageURL
 
@@ -143,6 +144,7 @@ Source = ColumnDataSource(data = dict(cID = cID,
 				      kappa = kappa, loc_by_kappa = loc_by_kappa, 
 			 	      rho = rho, loc_by_rho = loc_by_rho, 
 				      var = var, loc_by_var = loc_by_var, 
+                      VarSize = ((var)/np.max(var))*20 + 2,
 				      comp_color  = component_color,
 				      comp_status = component_status,
 				      ratio = ratio, loc_by_ratio = loc_by_ratio))
@@ -184,7 +186,7 @@ tooltips   =[("Component", "@cID"),("Kappa", "@kappa"),("Rho", "@rho"),("Varianc
 # Feature Plots
 # =============
 sp_kappa = figure(tools=[TOOLS, HoverKappa],width=325, height=250, y_axis_label='Kappa', toolbar_location='left')
-sp_kappa.circle('loc_by_kappa','kappa',size=5,color='comp_color',source=Source)
+sp_kappa.circle(x='loc_by_kappa',y='kappa',size=5,color='comp_color',source=Source)
 sp_legend = figure( title="", x_axis_type=None, y_axis_type=None, x_range=[-100, 100], y_range=[-100, 100],
             min_border=0, outline_line_color="#ffffff", width=325, height=250, toolbar_location="left", tools=[TOOLS])
 sp_legend.circle([-30,-30,-30,-30], [25,8,-9,-26], color =  ["#0000ff" ,"#ff0000" ,"#00ff00"     ,"#00ffff"], radius=5)
@@ -196,23 +198,23 @@ sp_tab_legend = Panel(child=sp_legend, title='Legend')
 sp_tabs_kappa = Tabs(tabs=[sp_tab_kappa,sp_tab_legend])
  
 sp_rho   = figure(tools=[TOOLS, HoverRho],width=325, height=250, y_axis_label='Rho', toolbar_location=None,x_range=sp_kappa.x_range)
-sp_rho.circle('loc_by_rho','rho',size=5,color='comp_color',source=Source)
+sp_rho.circle(x='loc_by_rho',y='rho',size=5,color='comp_color',source=Source)
 sp_rho.yaxis.axis_label_text_font_size = "12pt"
 sp_tab_rho  = Panel(child=sp_rho, title='Sorted by Rho')
 sp_tabs_rho = Tabs(tabs=[sp_tab_rho])
 
 sp_var   = figure(tools=[TOOLS,HoverVar],width=325, height=250, y_axis_label='Variance', toolbar_location=None,x_range=sp_kappa.x_range)
-sp_var.circle('loc_by_var','var',size=5,color='comp_color',source=Source)
+sp_var.circle(x='loc_by_var',y='var',size=5,color='comp_color',source=Source)
 sp_var.yaxis.axis_label_text_font_size = "12pt"
 sp_tab_var  = Panel(child=sp_var, title='Sorted by Variance')
 sp_tabs_var = Tabs(tabs=[sp_tab_var])
 
 sp_ratio = figure(tools=[TOOLS,HoverRatio],width=325, height=250, y_axis_label='K/R Ratio', toolbar_location=None,x_range=sp_kappa.x_range)
-sp_ratio.circle('loc_by_ratio','ratio',size=5,color='comp_color',source=Source)
+sp_ratio.circle(x='loc_by_ratio',y='ratio',size=5,color='comp_color',source=Source)
 sp_ratio.yaxis.axis_label_text_font_size = "12pt"
 
 sp_kvr = figure(tools=[TOOLS,HoverKvsR],width=325, height=250, y_axis_label='rho', x_axis_label='kappa', toolbar_location=None)
-sp_kvr.circle('kappa','rho',size=((var)/np.max(var))*20 + 2,color='comp_color',source=Source)
+sp_kvr.circle(x='kappa',y='rho',size='VarSize',color='comp_color',source=Source)
 sp_kvr.xaxis.axis_label_text_font_size = "12pt"
 sp_kvr.yaxis.axis_label_text_font_size = "12pt"
 
@@ -230,26 +232,37 @@ sp_tabs_left = Tabs(tabs=[sp_tab_ratio,sp_tab_kvr])
 default_ts_x  = range(Nt)
 default_ts_y  = np.zeros((Nt,))
 default_fft_x = freq_axis
-default_fft_y = np.zeros((Nt,))
+# This was changed to make the Columns in ColumnDateSource the same length. Confirm this is a benign change
+# default_fft_y = np.zeros((Nt,))
+default_fft_y = np.zeros((len(freq_axis),))
 
 # Generate Plots
 # ==============
 sp_ts = figure(tools=[],toolbar_location=None, width=680,height=200, x_axis_label='Time [TR]', 
-               title='Component Timeseries',x_range=(0,Nt), title_text_font_size='12pt')
+               title='Component Timeseries',x_range=(0,Nt))
 sp_ts.xaxis.axis_label_text_font_size = "12pt"
+sp_ts.title.text_font_size = '12pt'
 
 sp_fft = figure(tools=[],toolbar_location=None, width=680,height=200, x_axis_label='Frequency', 
-                title='Component Spectrum',x_range=(min(default_fft_x), max(default_fft_x)), title_text_font_size='12pt')
+                title='Component Spectrum',x_range=(min(default_fft_x), max(default_fft_x)))
 sp_fft.xaxis.axis_label_text_font_size = "12pt"
+sp_fft.title.text_font_size = '12pt'
 
 # Generate Data Sources for interactivity
 # =======================================
 timeseries_to_display = ColumnDataSource(data=dict(x=default_ts_x, y=default_ts_y))
-available_timeseries  = ColumnDataSource(data=dict(x=default_ts_x, y=comp_timeseries.T,comp_color  = component_color, cID=cID))
+
+# This was changed to make the Columns in ColumnDateSource the same length. Confirm this is a benign change
+#available_timeseries  = ColumnDataSource(data=dict(x=default_ts_x, y=comp_timeseries.T,comp_color  = component_color, cID=cID))
+available_timeseries  = ColumnDataSource(data=dict(x=range(Nc), y=comp_timeseries.T,comp_color  = component_color, cID=cID))
 sp_ts.line(x = 'x',y = 'y', source=timeseries_to_display, line_width=3)
 
 ffts_to_display = ColumnDataSource(data=dict(x=default_fft_x, y=default_fft_y))
-available_ffts  = ColumnDataSource(data=dict(x=default_fft_x, y=comp_ffts.T,comp_color  = component_color,cID=cID))
+
+# This was changed to make the Columns in ColumnDateSource the same length. Confirm this is a benign change
+# available_ffts  = ColumnDataSource(data=dict(x=default_fft_x, y=comp_ffts.T,comp_color  = component_color,cID=cID))
+available_ffts  = ColumnDataSource(data=dict(x=range(Nc), y=comp_ffts.T,comp_color  = component_color,cID=cID))
+
 sp_fft.line(x = 'x',y = 'y',source=ffts_to_display, line_width=3)
 # ==============================================================================
 
@@ -257,11 +270,15 @@ sp_fft.line(x = 'x',y = 'y',source=ffts_to_display, line_width=3)
 #                    BRAIN MAP PLOTS
 # Convert Input maps into usable mosaics
 # ======================================
-available_ICAmaps    = ColumnDataSource(data=dict(urls=ICAmap_paths,cID=cID))
+
+# This was changed to make the Columns in ColumnDateSource the same length. Confirm this is a benign change
+#available_ICAmaps    = ColumnDataSource(data=dict(urls=ICAmap_paths,cID=cID))
+available_ICAmaps    = ColumnDataSource(data=dict(urls=ICAmap_paths[:-1],cID=cID))
 ICAmap_to_display    = ColumnDataSource(data=dict(x=[0], y=[0], w=[int(width)], h=[int(height)], url=[ICAmap_default_path]))
 xdr                  = Range1d(start=-(int(width)/2), end=(int(width)/2))
 ydr                  = Range1d(start=-(int(height)/2), end=(int(height)/2))
-ICAmapFigure         = figure(tools=[],title="ICA maps", x_range=xdr, y_range=ydr,width=1200, height=int((int(height)*9)/10), x_axis_type=None, y_axis_type=None, toolbar_location=None, title_text_font_size ='12pt')
+ICAmapFigure         = figure(tools=[],title="ICA maps", x_range=xdr, y_range=ydr,width=1200, height=int((int(height)*9)/10), x_axis_type=None, y_axis_type=None, toolbar_location=None)
+ICAmapFigure.title.text_font_size = '12pt'
 ICAmapImg            = ImageURL(url="url", x="x", y="y", w="w", h="h", anchor="center")
 ICAmapFigure.add_glyph(ICAmap_to_display,ICAmapImg)
 ICAmapFigure.outline_line_color='#ffffff'
@@ -328,11 +345,11 @@ kvr_taptool.callback   = update_ts
 
 # ==============================================================================
 #                       GRAPH   LAYOUT
-top_left  = hplot(sp_tabs_kappa, sp_tabs_rho)
-top_right = hplot(sp_tabs_var, sp_tabs_left)
-top       = hplot(top_left, top_right)
-middle    = hplot(sp_ts, sp_fft)
-pl        = vplot(comp_table_DTABLE,top, middle,ICAmapFigure)
-p         = hplot(pl)
+top_left  = row(sp_tabs_kappa, sp_tabs_rho)
+top_right = row(sp_tabs_var, sp_tabs_left)
+top       = row(top_left, top_right)
+middle    = row(sp_ts, sp_fft)
+pl        = column(comp_table_DTABLE,top, middle,ICAmapFigure)
+p         = row(pl)
 show(p)
 # ==============================================================================
