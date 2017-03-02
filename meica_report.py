@@ -1,9 +1,14 @@
 #!/usr/bin/env python
+
+from __future__ import print_function
+
 """
 Gutierrez, B.  Generates Meica report form.
 
 """
+
 __version__ = "3.0"
+
 
 from multiprocessing import cpu_count
 import subprocess
@@ -11,12 +16,14 @@ import argparse
 import sys
 import os
 import shutil
+from glob import glob
 
 path = os.path.abspath(os.path.dirname(__file__))
 print("++ INFO [Main]: Using Report library located in: %s" % path)
 if not path in sys.path:
     sys.path.insert(1, path)
-del path
+# We'll use this later!
+# del path
 
 def dep_check():
     print("++ INFO [Main]: Checking for dependencies....")
@@ -105,22 +112,28 @@ if __name__=='__main__':
         fails += 1
     if fails != 0:
         sys.exit()
-    
+
     # Set all output paths
     # --------------------
     print("++ INFO [Main]: Setting up directories.")
     outputDir = os.path.abspath(options.out_dir)
     figureDir = os.path.abspath(options.out_dir)
+
+    # The output dir should either be properly set up, or not exist
+
     if options.overwrite:
         subprocess.call('rm -rf %s' % outputDir, shell=True)
     if not (os.path.exists(outputDir)):
         os.mkdir(outputDir)
-    os.mkdir('%s/sphinx_files' % outputDir)
-    os.mkdir('%s/axialized_nifti' % outputDir)
+        os.mkdir('%s/axialized_nifti' % outputDir)
 
-    shutil.copytree('Report_Figures', '%s/Report_Figures' % outputDir)
-    # Might need to go into root dir, where we could use a glob
-    shutil.copytree('sphinx_files', '%s/Report_Figures' % outputDir)
+        shutil.copytree('%s/Report_Figures' % path,
+                        '%s/Report_Figures' % outputDir)
+
+        # XXX should be indented for final version
+        for fname in glob('%s/sphinx_files/*' % path):
+            print('Copying {} to {}'.format(fname, outputDir))
+            shutil.copy(fname, outputDir)
     
     # =========  report starts   =========
     # ====================================
@@ -235,6 +248,8 @@ if __name__=='__main__':
     # ----------------
     os.chdir(outputDir)
     subprocess.call('mkdir _static', shell = True)
+
+    # XXX Make should not get called from python
     subprocess.call('make html'    , shell = True)
     subprocess.call('make latex'   , shell = True)
     
