@@ -65,6 +65,7 @@ if __name__=='__main__':
     parser.add_argument(     "--motion",    dest='motion',    help="Path to motion.1D file",                                     type=str, default=None)
     parser.add_argument(     "--ncpus",     dest='Ncpus',     help='Number of cpus available. Default will be half the # available',     type=int, default=None)
     parser.add_argument(     "--overwrite", dest='overwrite', help="overwrite files previous created", action='store_true')
+    
     options = parser.parse_args()
     
     if (options.Ncpus is None) or (options.Ncpus > cpu_count()):
@@ -233,6 +234,7 @@ if __name__=='__main__':
     
     # make .rst files for sphinx to use to generate the report
     # --------------------------------------------------------
+
     rst_files.diagnostics_rst(outputDir)
     rst_files.index_rst(outputDir)
     rst_files.intro_rst(outputDir)
@@ -252,6 +254,7 @@ if __name__=='__main__':
     subprocess.call('make html'    , shell = True)
     subprocess.call('make latex'   , shell = True)
     
+
     subprocess.call('mv %s/_build/* %s' % (outputDir, outputDir), shell = True)
     #subprocess.call('rm -rf _*', shell = True)
     subprocess.call('mv %s/*.rst %s/sphinx_files/' % (outputDir, outputDir), shell = True)
