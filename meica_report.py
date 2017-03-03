@@ -256,7 +256,11 @@ if __name__=='__main__':
     
 
     subprocess.call('mv %s/_build/* %s' % (outputDir, outputDir), shell = True)
+
+    # It's not clear why we'd want to move these out of the way - they don't
+    # hurt anything and make it hard to test what happened.
+
     #subprocess.call('rm -rf _*', shell = True)
-    subprocess.call('mv %s/*.rst %s/sphinx_files/' % (outputDir, outputDir), shell = True)
-    subprocess.call('mv %s/Makefile %s/sphinx_files' % (outputDir, outputDir), shell = True)
-    subprocess.call('mv %s/conf.py %s/sphinx_files' % (outputDir, outputDir), shell = True)
+    # subprocess.call('mv %s/*.rst %s/sphinx_files/' % (outputDir, outputDir), shell = True)
+    # subprocess.call('mv %s/Makefile %s/sphinx_files' % (outputDir, outputDir), shell = True)
+    # subprocess.call('mv %s/conf.py %s/sphinx_files' % (outputDir, outputDir), shell = True)
