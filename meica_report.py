@@ -17,22 +17,24 @@ if not path in sys.path:
     sys.path.insert(1, path)
 del path
 
+
 def dep_check():
     print("++ INFO [Main]: Checking for dependencies....")
-    fails   = 0
-    modules = set(["numpy", "matplotlib","argparse","scipy","bokeh","nibabel","sphinx"])
-
+    fails = 0
+    modules = set(["numpy", "matplotlib", "argparse", "scipy", "bokeh",
+                   "nibabel", "sphinx"])
     for m in modules:
         try:
             __import__(m)
         except ImportError:
             fails += 1
-            print("++ ERROR [Main]: Can't import Module %s. Please install." % m)
-                
+            print("++ ERROR [Main]: Can't import Module %s. Please install."
+                  % m)
     if fails == 0:
         print(" +              All Dependencies are OK.")
     else:
-        print(" +              All dependencies not available. Please install according to above error messages.")
+        print(" +              All dependencies not available. Please "
+              + "install according to above error messages.")
         print(" +              Program exited.")
         sys.exit()
 
@@ -41,8 +43,7 @@ if __name__=='__main__':
     print("-- SFIM ME-ICA Report version %s --" % __version__)
     print("------------------------------------")
     dep_check()
-    
-    
+
     from argparse import ArgumentParser
     import meica_figures
     import rst_files
@@ -53,17 +54,22 @@ if __name__=='__main__':
     # Parse input parameters
     # ----------------------
     parser = ArgumentParser()
-    parser.add_argument("-t","--TED_dir",   dest='TED_dir',   help="Path to meica output TED directory",                         type=str, default=None)
+    parser.add_argument("-t", "--TED_dir", dest='TED_dir',
+                        help="Path to meica output TED directory",
+                        type=str, default=None)
     parser.add_argument("-o","--out_dir",   dest='out_dir',   help="Output directory to output report, default='./meica.Report'",type=str, default='./meica.Report')
     parser.add_argument(     "--motion",    dest='motion',    help="Path to motion.1D file",                                     type=str, default=None)
     parser.add_argument(     "--ncpus",     dest='Ncpus',     help='Number of cpus available. Default will be half the # available',     type=int, default=None)
     parser.add_argument(     "--overwrite", dest='overwrite', help="overwrite files previous created", action='store_true')
+    parser.add_argument("--static_only", dest='no_bokeh',
+                        help="Only make static report (no interactive plots)",
+                        action='store_true')
     options = parser.parse_args()
-    
+
     if (options.Ncpus is None) or (options.Ncpus > cpu_count()):
         Ncpu = int(cpu_count()/2)
     else:
-        Ncpu = int(options.Ncpus) 
+        Ncpu = int(options.Ncpus)
 
     print("++ INFO [Main]: Output dir = %s" % os.path.abspath(os.path.expanduser(options.out_dir)))
     print("++ INFO [Main]: Overwrite old files? %s" % options.overwrite)
@@ -105,7 +111,7 @@ if __name__=='__main__':
         fails += 1
     if fails != 0:
         sys.exit()
-    
+
     # Set all output paths
     # --------------------
     print("++ INFO [Main]: Setting up directories.")
@@ -119,14 +125,15 @@ if __name__=='__main__':
     subprocess.call('mkdir %s/Report_Figures' % outputDir,    shell=True)
     subprocess.call('mkdir %s/sphinx_files' % outputDir,      shell=True)
     subprocess.call('mkdir %s/axialized_nifti' % outputDir, shell=True)
-    subprocess.call('cp %s/bokeh_plot.py %s/Report_Figures/bokeh_plot.py' % (os.path.dirname(__file__), outputDir),shell=True)
+    if not options.no_bokeh:
+        subprocess.call('cp %s/bokeh_plot.py %s/Report_Figures/bokeh_plot.py' % (os.path.dirname(__file__), outputDir),shell=True)
     # =========  report starts   =========
     # ====================================
-    
+
     # load data
     # ---------
     print("++ INFO [Main]: Loading data...")
-    
+
     ctab_unordered          = np.loadtxt(options.TED_dir + '/' + 'comp_table.txt')
     Denoised_components_ts  = np.loadtxt(options.TED_dir + '/' + 'meica_mix.1D')
     Denoised_ts             = ni.load(options.TED_dir + '/' + 'dn_ts_OC.nii').get_data()
@@ -135,8 +142,8 @@ if __name__=='__main__':
         Denoised_components = ni.load(options.TED_dir + '/' + 'betas_OC.nii').get_data()
     except:
         Denoised_components = ni.load(glob.glob(options.TED_dir + '/' + '*.ICA.Zmaps.nii')[0]).get_data()
-    
-    
+
+
     # parse and order component table columns
     # ---------------------------------------
     ctab = np.zeros((ctab_unordered.shape[0],5))
@@ -166,7 +173,7 @@ if __name__=='__main__':
 
     ctab = ctab[ctab[:,1].argsort()[::-1]]
     ctab[:,0] = np.arange(ctab.shape[0])
-    
+
     # set variables
     # -------------
     meica_txt = []
@@ -182,7 +189,7 @@ if __name__=='__main__':
                 middle_kappa = ((lines[i]).split(' ')[1]).split(',')
             if "IGN" in lines[i]:
                 ignored = ((lines[i]).split(' ')[1]).split(',')
-                
+
     else:
         accepted = np.loadtxt(options.TED_dir + '/' + 'accepted.txt', delimiter = ',', dtype = 'int', ndmin = 1)
         rejected = np.loadtxt(options.TED_dir + '/' + 'rejected.txt', delimiter = ',', dtype = 'int', ndmin = 1)
@@ -208,28 +215,30 @@ if __name__=='__main__':
     else:
         meica_txt.append("Max head displacement in any one dirrection:   %s\nTR of Max Head displacement:   %s\nMax rate of head motion:   %s\nTR of max head motion rate:   %s" % (' ',' ',' ',' '))
         motion_file = ''
-    
+
     if options.TED_dir[-1] == '/':
         TED_dir = options.TED_dir[:-1]
     else:
         TED_dir = options.TED_dir
     newline = "#!/usr/bin/env python \n" + ("TED_dir = '%s' \n" % os.path.abspath(TED_dir)) + ("outputDir,figures = '%s','%s'\n" % (outputDir,'Report_Figures'))
-    with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'r') as original: bokeh_plot = original.read()
-    with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'w') as modified: modified.write(newline + bokeh_plot)
-    
+    if not options.no_bokeh:
+        with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'r') as original: bokeh_plot = original.read()
+        with open("%s/Report_Figures/bokeh_plot.py" % outputDir, 'w') as modified: modified.write(newline + bokeh_plot)
+
     # set up sphinx documentation
     # ---------------------------
-    
+
     sphinx_files.conf(__version__,outputDir)
     sphinx_files.make_file(outputDir)
-    
+
     # make .rst files for sphinx to use to generate the report
     # --------------------------------------------------------
     rst_files.diagnostics_rst(outputDir)
-    rst_files.index_rst(outputDir)
+    rst_files.index_rst(outputDir, options.no_bokeh)
     rst_files.intro_rst(outputDir)
     rst_files.analysis_rst(accepted, rejected, middle_kappa, ignored, ctab, outputDir, motion_file, options.TED_dir)
-    rst_files.dynamic_analysis_rst(accepted, rejected, middle_kappa, ignored, ctab, outputDir, motion_file, options.TED_dir)
+    if not options.no_bokeh:
+        rst_files.dynamic_analysis_rst(accepted, rejected, middle_kappa, ignored, ctab, outputDir, motion_file, options.TED_dir)
 
     ofh = open("%s/meica_report.txt" % options.out_dir,"w")
     ofh.write("\n".join(meica_txt) + "\n")
@@ -241,7 +250,7 @@ if __name__=='__main__':
     subprocess.call('mkdir _static', shell = True)
     subprocess.call('make html'    , shell = True)
     subprocess.call('make latex'   , shell = True)
-    
+
     subprocess.call('mv %s/_build/* %s' % (outputDir, outputDir), shell = True)
     #subprocess.call('rm -rf _*', shell = True)
     subprocess.call('mv %s/*.rst %s/sphinx_files/' % (outputDir, outputDir), shell = True)

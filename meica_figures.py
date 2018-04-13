@@ -61,8 +61,8 @@ def FFT(Denoised_components_ts, TR, N, outputDir):
     plt.close()
 
 """
-Primary usage is for finding upper and lower bounds for non-zero 2d slices so as to 
-display only useful information when displaying montages of three dimmensional images.  
+Primary usage is for finding upper and lower bounds for non-zero 2d slices so as to
+display only useful information when displaying montages of three dimmensional images.
 Also returns an image with 2D zero-filled slices removed, but this is not always the more useful option.
 image: 3D array
 axis: String Dimmension to look for 2D zero-filled slices in, i.e, 'x','y','z'.
@@ -118,7 +118,7 @@ def ImageDimBounds(image, axis):
     return (cropped_img,lower_bound,img_bounds.shape[0]-1-upper_bound)
 
 def montage_control(TED, outputDir, Denoised_components, Denoised_components_ts, Ncpu):
-    
+
     generic_image = np.ones(shape=Denoised_components[:,:,:,0].shape)
     fig           = plt.figure(figsize=(12,4))
     grid1         = ImageGrid(fig, 111 , nrows_ncols=(1,10),cbar_location='right',add_all=True,axes_pad=0.0,share_all=True,cbar_mode=None)
@@ -137,7 +137,7 @@ def montage_control(TED, outputDir, Denoised_components, Denoised_components_ts,
         grid1[j].axes.get_yaxis().set_ticks([])
     plt.savefig('%s/Report_Figures/Sagittal_GS_Component_XX' % (outputDir), bbox_inches='tight', dpi=150)
     plt.close()
-    
+
     fig = plt.figure(figsize=(12,4))
     grid1 = ImageGrid(fig, 111 , nrows_ncols=(1,10),cbar_location='right',add_all=True,axes_pad=0.0,share_all=True,cbar_mode=None)
     for j in range(10):
@@ -194,7 +194,7 @@ def gs_montage(item):
         grid1[j].axes.get_yaxis().set_ticks([])
     plt.savefig('%s/Report_Figures/Axial_GS_Component_' % outputDir + N, bbox_inches='tight', dpi=150)
     plt.close()
-    
+
     fig = plt.figure(figsize = (12,4))
     grid2 = ImageGrid(fig, 111 , nrows_ncols=(1,10),cbar_location='right',add_all=True,axes_pad=0.0,share_all=True,cbar_mode=None)
     for j in range(10):
@@ -204,7 +204,7 @@ def gs_montage(item):
         grid2[j].axes.get_yaxis().set_ticks([])
     plt.savefig('%s/Report_Figures/Sagittal_GS_Component_' % outputDir + N, bbox_inches='tight', dpi=150)
     plt.close()
-    
+
     fig = plt.figure(figsize = (12,4))
     grid3 = ImageGrid(fig, 111 , nrows_ncols=(1,10),cbar_location='right',add_all=True,axes_pad=0.0,share_all=True,cbar_mode=None)
     for j in range(10):
@@ -223,7 +223,7 @@ def gs_montage(item):
     plt.xlim([0,Denoised_components_ts.shape[0]-1])
     plt.savefig('%s/Report_Figures/TimeSeries_' % outputDir + N, bbox_inches='tight')
     plt.close()
-    
+
     print("++ INFO [Figures]: Component [%s] figure completed." % N)
 
 """
@@ -343,7 +343,7 @@ def tsnr(tsoc_data, medn_data, outputDir):
      % (np.percentile(medn_mask,50),np.percentile(tsoc_mask,50),np.percentile(frac_mask,50)))
 
 def kappa_vs_rho_plot(accepted,rejected,middle_kappa,ignored,ctab,outputDir,TED_dir):
-    plt.figure(2)# this simple figure is created and removed in order to take the legend from it.  
+    plt.figure(2)# this simple figure is created and removed in order to take the legend from it.
     #plt.legend has issue where marker size in legend is propoertional to marker size in plot
     trial_1 = plt.scatter(1,1, c = 'b', marker = 'o')
     trial_2 = plt.scatter(1,1, c = 'r', marker = 'v')
@@ -352,15 +352,15 @@ def kappa_vs_rho_plot(accepted,rejected,middle_kappa,ignored,ctab,outputDir,TED_
     plt.close(2)
     fig = plt.figure()
     plt.title('ME-ICA Analysis, ' + r'$\kappa$' + ' vs ' + r'$\rho$', fontsize = 14)
-    ACC = plt.scatter(ctab[accepted,1], ctab[accepted,2], c = 'b', marker = 'o', s = 50 * ctab[accepted,4]) 
+    ACC = plt.scatter(ctab[accepted,1], ctab[accepted,2], c = 'b', marker = 'o', s = 50 * ctab[accepted,4])
     REJ = plt.scatter(ctab[rejected,1], ctab[rejected,2], c = 'r', marker = 'v', s = 50 * ctab[rejected,4])
     MID = plt.scatter(ctab[middle_kappa,1], ctab[middle_kappa,2], c = 'g', marker = '^', s = 50 * ctab[middle_kappa,4])
     IGN = plt.scatter(ctab[ignored,1], ctab[ignored,2], c = 'c', marker = '*', s = 50 * ctab[ignored,4])
     plt.legend((trial_1, trial_2, trial_3, trial_4),('accepted','rejected','middle_kappa',
         'ignored'), scatterpoints = 1, loc = 'upper right', markerscale = 2)
     plt.gca().xaxis.set_major_locator(MaxNLocator(nbins = 5))
-    plt.tick_params(axis = 'x', which = 'both', top = 'off')
-    plt.tick_params(axis = 'y', which = 'both', right = 'off')
+    plt.tick_params(axis = 'x', which = 'both', top = False)
+    plt.tick_params(axis = 'y', which = 'both', right = False)
     plt.xlabel(r'$\kappa$', fontsize = 15)
     plt.ylabel(r'$\rho$', fontsize = 15)
     plt.savefig('%s/Report_Figures/kappa_vs_rho.png'  % outputDir)
@@ -379,8 +379,8 @@ def kappa_vs_rho_plot(accepted,rejected,middle_kappa,ignored,ctab,outputDir,TED_
     else:
         middle_high_k = middle_kappa[0]
     print("++ INFO [Figures]: kappa vs rho figures created.")
-    return("Number of accepted components:   %s\nNumber of rejected components:   %s\nNumber of middle kappa components:   %s\nNumber of ignored components:   %s\naccepted variance:   %s" % 
-        (len(accepted),len(rejected),len(middle_kappa),len(ignored),sum(ctab[accepted,4])) + 
+    return("Number of accepted components:   %s\nNumber of rejected components:   %s\nNumber of middle kappa components:   %s\nNumber of ignored components:   %s\naccepted variance:   %s" %
+        (len(accepted),len(rejected),len(middle_kappa),len(ignored),sum(ctab[accepted,4])) +
         "\nRejected variance:   %s\nMiddle Kappa variance:   %s\nIgnored variance:   %s\nVariance explained by ICA:   %s\nLargest variance accepted component:   %s\nHighest kappa rejected component:   %s\nHighest kappa middle kappa component:   %s"
          % (sum(ctab[rejected,4]),sum(ctab[middle_kappa,4]),sum(ctab[ignored,4]),lines[index][41:-1],accepted[np.argmax(ctab[accepted,4])],reject_high_k,middle_high_k))
 """
@@ -432,6 +432,5 @@ def motion(outputDir, motion_file):
     plt.close()
     print("++ INFO [Figures]: Motion figures created.")
     itemindex = np.where(np.absolute(motion)==np.max(np.absolute(motion)))
-    return("Max head displacement:   %s\nTime of max head displacement (TR):   %s\nMax rate of head motion:   %s\nTime of max head motion rate (TR):   %s" 
+    return("Max head displacement:   %s\nTime of max head displacement (TR):   %s\nMax rate of head motion:   %s\nTime of max head motion rate (TR):   %s"
         % (np.max(np.absolute(motion)),itemindex[0][0],np.max(np.absolute(deriv)),np.argmax(np.absolute(deriv))))
-

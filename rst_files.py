@@ -21,7 +21,7 @@ def dynamic_analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion
             sl.append(ctab_txt[i] + '\n')
     sl.append('\nPlease remember that the denoised time series is accepted AND ignored bin and components in neither rejected nor middle kappa are considered BOLD-like')
     sl.append('\n+----------------+------------------+-------------------------+\n' +
-          '|                | %  Total Variance| %  Total Variance(norm) |\n' + 
+          '|                | %  Total Variance| %  Total Variance(norm) |\n' +
           '+================+==================+=========================+')
     sl.append('| **Accepted**   |        %s    |          %s         |' % (digit_length(sum(ctab[accept,3]),6), digit_length(sum(ctab[accept,4]),6)))
     sl.append('+----------------+------------------+-------------------------+')
@@ -31,8 +31,7 @@ def dynamic_analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion
     sl.append('+----------------+------------------+-------------------------+')
     sl.append('| **Ignored**    |        %s    |          %s         |' % (digit_length(sum(ctab[ignore,3]),6), digit_length(sum(ctab[ignore,4]),6)))
     sl.append('+----------------+------------------+-------------------------+\n')
-
-    sl.append('In the scatter plots below, you can click on any point to see the component time series.  ' + 
+    sl.append('In the scatter plots below, you can click on any point to see the component time series.  ' +
             'The size of the scatter points in the plot furthest to the right correspond to the variance of the component.  ' +
             'The green components are accepted, the red are everything else.\n')
     sl.append('.. bokeh-plot:: %s/bokeh_plot.py' % figures)
@@ -54,7 +53,7 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
             sl.append(ctab_txt[i] + '\n')
     sl.append('\nPlease remember that the denoised time series is accepted AND ignored bin and components in neither rejected nor middle kappa are considered BOLD-like')
     sl.append('\n+----------------+------------------+-------------------------+\n' +
-          '|                | %  Total Variance| %  Total Variance(norm) |\n' + 
+          '|                | %  Total Variance| %  Total Variance(norm) |\n' +
           '+================+==================+=========================+')
     sl.append('| **Accepted**   |        %s    |          %s         |' % (digit_length(sum(ctab[accept,3]),6), digit_length(sum(ctab[accept,4]),6)))
     sl.append('+----------------+------------------+-------------------------+')
@@ -64,7 +63,6 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
     sl.append('+----------------+------------------+-------------------------+')
     sl.append('| **Ignored**    |        %s    |          %s         |' % (digit_length(sum(ctab[ignore,3]),6), digit_length(sum(ctab[ignore,4]),6)))
     sl.append('+----------------+------------------+-------------------------+\n')
-
     sl.append('Graphs')
     sl.append('++++++\n')
     #sl.append('.. bokeh-plot:: %s/bokeh_plot.py' % figures)
@@ -83,12 +81,12 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
     sl.append('=============  =============  =================  =============')
     sl.append('# of Accepted  # of Rejected  # of Middle kappa  # of Ignored ')
     sl.append('=============  =============  =================  =============')
-    sl.append('     %s             %s              %s                 %s    ' % 
+    sl.append('     %s             %s              %s                 %s    ' %
         (len(accept), len(reject), len(middle), len(ignore)))
     sl.append('=============  =============  =================  =============\n\n')
     sl.append('\nAccepted Components\n' + '+++++++++++++++++++')
     sl.append('The following images are the accepted components from meica ouput')
-    
+
     N = 0
     for i in accept:
         sl.append('\nComponent %s: Var %s' % (int(i),digit_length(ctab[accept[N],3],2)))
@@ -96,7 +94,7 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
         sl.append('=============  =============  =============  =================')
         sl.append('     kappa         rho         %s Variance    %s Variance(norm)' % ('%','%'))
         sl.append('=============  =============  =============  =================')
-        sl.append('%s       %s         %s           %s       ' % 
+        sl.append('%s       %s         %s           %s       ' %
             (digit_length(ctab[accept[N],1],8), digit_length(ctab[accept[N],2],7), digit_length(ctab[accept[N],3],3), digit_length(ctab[accept[N],4],3)))
         sl.append('=============  =============  =============  =================\n')
         sl.append('.. image:: %s/Axial_GS_Component_'    % figures + str(i).zfill(size) + '.png'); sl.append('\t:width: 95%\n')
@@ -115,7 +113,7 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
         sl.append('=============  =============  =============  =================')
         sl.append('     kappa         rho         %s Variance    %s Variance(norm)' % ('%','%'))
         sl.append('=============  =============  =============  =================')
-        sl.append('%s       %s         %s           %s       ' % 
+        sl.append('%s       %s         %s           %s       ' %
             (digit_length(ctab[reject[N],1],8), digit_length(ctab[reject[N],2],7), digit_length(ctab[reject[N],3],3), digit_length(ctab[reject[N],4],3)))
         sl.append('=============  =============  =============  =================\n')
         sl.append('.. image:: %s/Axial_GS_Component_'    % figures + str(i).zfill(size) + '.png'); sl.append('\t:width: 95%\n')
@@ -134,7 +132,7 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
         sl.append('=============  =============  =============  =================')
         sl.append('     kappa         rho         %s Variance    %s Variance(norm)' % ('%','%'))
         sl.append('=============  =============  =============  =================')
-        sl.append('%s       %s         %s           %s       ' % 
+        sl.append('%s       %s         %s           %s       ' %
             (digit_length(ctab[middle[N],1],8), digit_length(ctab[middle[N],2],7), digit_length(ctab[middle[N],3],4), digit_length(ctab[middle[N],4],4)))
         sl.append('=============  =============  =============  =================\n')
         sl.append('.. image:: %s/Axial_GS_Component_'    % figures + str(i).zfill(size) + '.png'); sl.append('\t:width: 95%\n')
@@ -147,13 +145,13 @@ def analysis_rst(accept, reject, middle, ignore, ctab, outputDir, motion_file, T
     sl.append('\nIgnore Components\n' + '+++++++++++++++++++')
     sl.append('The following images are the ignored components from meica ouput.  These are kept with in the denoised timeseries for increased variance')
     N = 0
-    for i in ignore: 
+    for i in ignore:
         sl.append('\nComponent %s: Var %s' % (int(i),digit_length(ctab[ignore[N],3],2)))
         sl.append('-----------------------------\n')
         sl.append('=============  =============  =============  =================')
         sl.append('     kappa         rho         %s Variance    %s Variance(norm)' % ('%','%'))
         sl.append('=============  =============  =============  =================')
-        sl.append('%s       %s         %s           %s       ' % 
+        sl.append('%s       %s         %s           %s       ' %
             (digit_length(ctab[ignore[N],1],8), digit_length(ctab[ignore[N],2],7), digit_length(ctab[ignore[N],3],4), digit_length(ctab[ignore[N],4],4)))
         sl.append('=============  =============  =============  =================\n\n')
         sl.append('.. image:: %s/Axial_GS_Component_'    % figures + str(i).zfill(size) + '.png'); sl.append('\t:width: 95%\n')
@@ -176,7 +174,7 @@ def diagnostics_rst(outputDir):
     sl = []
     sl.append('Preliminary Diagnostics\n' + '==========================\n')
     sl.append('The signal to noise ratio (TSNR) for a dataset is defined as the mean over the standard deviation of the dataset.  ' +
-        'Meica.py denoises the BOLD time signal which should increase TSNR. This will be seen as the medn dataset having a greater ' + 
+        'Meica.py denoises the BOLD time signal which should increase TSNR. This will be seen as the medn dataset having a greater ' +
         'TSNR than the tsoc dataset.\n')
     sl.append('TSNR\n' + '+++++++')
     sl.append('Absolute TSNR of the medn NIFTI1 dataset, Accepted and Ignored components:\n')
@@ -205,7 +203,9 @@ def diagnostics_rst(outputDir):
 """
 make index.rst file
 """
-def index_rst(outputDir):
+
+
+def index_rst(outputDir, no_bokeh):
     title = outputDir.split('/')[-2]
     sl = []
     sl.append(title)
@@ -222,8 +222,9 @@ def index_rst(outputDir):
     sl.append('.. toctree::')
     sl.append('   :maxdepth: 2\n')
     sl.append('   Intro')
-    sl.append('   Diagnostics') 
-    sl.append('   Dynamic')
+    sl.append('   Diagnostics')
+    if not no_bokeh:
+        sl.append('   Dynamic')
     sl.append('   Analysis')
     sl.append('\n\n\nSearch')
     sl.append('======\n')
@@ -256,11 +257,15 @@ def intro_rst(outputDir):
 Controls length of floats.  Needs to be done because spacing important for sphinx.
 This function is not designed to work if length argument is less than the number of digits before the decimal.
 """
-def digit_length(n,length):
+def digit_length(n, length):
     n_string = str(n)
     if len(n_string) < length:
         n_string = n_string + ' '*(length - len(n_string))
     elif len(n_string) > length:
-        n_string = str(round(n,length))
+        n_string = str(round(n, length))
+        # If rounding ends in a 0, then this becomes too short so 0 pad
+        if len(n_string) < length:
+            n_string = n_string + ' '*(length - len(n_string))
+    else:
+        n_string = n_string
     return(n_string)
-
