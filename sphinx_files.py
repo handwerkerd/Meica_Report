@@ -3,8 +3,16 @@
 Gutierrez, B.  Generates the analysis.rst file
 """
 
-def conf(__version__, outputDir):
-	sl = """#!/usr/bin/env python3
+def conf(__version__, outputDir, no_bokeh=False):
+
+    if not no_bokeh:
+	    include_bokeh_extention = """
+	    extensions = ["bokeh.sphinxext.bokeh_plot"]
+	    """
+    else:
+	    include_bokeh_extention = """ """
+
+    sl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # ME-ICA Report documentation build configuration file, created by
@@ -36,7 +44,7 @@ import shlex
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["bokeh.sphinxext.bokeh_plot"]
+""" + include_bokeh_extention + """
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -291,9 +299,9 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False"""
 
 
-	ofh = open("%s/conf.py" % outputDir,"w")
-	ofh.write(sl)
-	ofh.close()
+    ofh = open("%s/conf.py" % outputDir,"w")
+    ofh.write(sl)
+    ofh.close()
 
 def make_file(outputDir):
 	sl = '''# Makefile for Sphinx documentation

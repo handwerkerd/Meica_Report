@@ -315,7 +315,7 @@ def tsnr(tsoc_data, medn_data, outputDir):
     tsoc_mask = tsoc_tsnr[np.isnan(tsoc_tsnr) == False]
     frac_mask = frac_tsnr[np.isnan(frac_tsnr) == False]
     fig = plt.figure()
-    plt.hist(medn_mask, bins = 100, range = [np.percentile(medn_mask,5),np.percentile(medn_mask,95)])
+    plt.hist(medn_mask, bins = 100, range = [np.percentile(medn_mask,0.01),np.percentile(medn_mask,99.99)])
     plt.title('TSNR medn', fontsize = 15)
     plt.xlabel('TSNR', fontsize = 15)
     plt.ylabel('Frequency', fontsize = 15)
@@ -323,7 +323,7 @@ def tsnr(tsoc_data, medn_data, outputDir):
     plt.close()
 
     fig = plt.figure()
-    plt.hist(tsoc_mask, bins = 100, range = [np.percentile(tsoc_mask,5),np.percentile(tsoc_mask,95)])
+    plt.hist(tsoc_mask, bins = 100, range = [np.percentile(tsoc_mask,0.01),np.percentile(tsoc_mask,99.99)])
     plt.title('TSNR tsoc', fontsize = 15)
     plt.xlabel('TSNR', fontsize = 15)
     plt.ylabel('Frequency', fontsize = 15)
@@ -332,7 +332,7 @@ def tsnr(tsoc_data, medn_data, outputDir):
 
     #plot histogram of the TSNR ratio of medn/tsnr
     fig = plt.figure()
-    plt.hist(frac_mask, bins = 100, range = [np.percentile(frac_mask,5),np.percentile(frac_mask,95)])
+    plt.hist(frac_mask, bins = 100, range = [np.percentile(frac_mask,0.01),np.percentile(frac_mask,99.99)])
     plt.title('TSNR medn / TSNR tsoc', fontsize = 15)
     plt.xlabel('TSNR ratio', fontsize = 15)
     plt.ylabel('Frequency', fontsize = 15)

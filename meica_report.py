@@ -228,7 +228,8 @@ if __name__=='__main__':
     # set up sphinx documentation
     # ---------------------------
 
-    sphinx_files.conf(__version__,outputDir)
+
+    sphinx_files.conf(__version__,outputDir, no_bokeh=options.no_bokeh)
     sphinx_files.make_file(outputDir)
 
     # make .rst files for sphinx to use to generate the report
